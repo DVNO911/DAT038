@@ -25,15 +25,15 @@ public class Lab3 {
             Stopwatch stopwatch2 = new Stopwatch();
 
             // Read all input files
-            BST<Path, Ngram[]> files = readPaths(paths);
+            ScapegoatTree<Path, Ngram[]> files = readPaths(paths);
             stopwatch.finished("Reading all input files");
 
             // Build index of n-grams (not implemented yet)
-            BST<Ngram, ArrayList<Path>> index = buildIndex(files);
+            ScapegoatTree<Ngram, ArrayList<Path>> index = buildIndex(files);
             stopwatch.finished("Building n-gram index");
 
             // Compute similarity of all file pairs
-            BST<PathPair, Integer> similarity = findSimilarity(files, index);
+            ScapegoatTree<PathPair, Integer> similarity = findSimilarity(files, index);
             stopwatch.finished("Computing similarity scores");
 
             // Find most similar file pairs, arranged in
@@ -43,7 +43,7 @@ public class Lab3 {
             stopwatch2.finished("In total the program");
 
             // Print out some statistics
-            System.out.println("\nBST balance statistics:");
+            System.out.println("\nScapegoatTree balance statistics:");
             System.out.printf("  files: size %d, height %d\n", files.size(), files.height());
             System.out.printf("  index: size %d, height %d\n", index.size(), index.height());
             System.out.printf("  similarity: size %d, height %d\n", similarity.size(), similarity.height());
@@ -59,8 +59,8 @@ public class Lab3 {
     }
 
     // Phase 1: Read in each file and chop it into n-grams.
-    static BST<Path, Ngram[]> readPaths(Path[] paths) throws IOException {
-        BST<Path, Ngram[]> files = new BST<>();
+    static ScapegoatTree<Path, Ngram[]> readPaths(Path[] paths) throws IOException {
+        ScapegoatTree<Path, Ngram[]> files = new ScapegoatTree<>();
         for (Path path: paths) {
             String contents = new String(Files.readAllBytes(path));
             Ngram[] ngrams = Ngram.ngrams(contents, 5);
@@ -77,8 +77,8 @@ public class Lab3 {
         return files;
     }
 
-    static BST<Ngram, ArrayList<Path>> buildIndex(BST<Path, Ngram[]> files) {
-        BST<Ngram, ArrayList<Path>> index = new BST<>();
+    static ScapegoatTree<Ngram, ArrayList<Path>> buildIndex(ScapegoatTree<Path, Ngram[]> files) {
+        ScapegoatTree<Ngram, ArrayList<Path>> index = new ScapegoatTree<>();
             for(Path p : files.keys()){
                 for(Ngram ngram : files.get(p)){
                     if(index.contains(ngram)){
@@ -97,8 +97,8 @@ public class Lab3 {
 
     // Phase 3: Count how many n-grams each pair of files has in common.
 
-    static BST<PathPair, Integer> findSimilarity(BST<Path, Ngram[]> files, BST<Ngram, ArrayList<Path>> index) {
-        BST<PathPair, Integer> similarity = new BST<>();
+    static ScapegoatTree<PathPair, Integer> findSimilarity(ScapegoatTree<Path, Ngram[]> files, ScapegoatTree<Ngram, ArrayList<Path>> index) {
+        ScapegoatTree<PathPair, Integer> similarity = new ScapegoatTree<>();
         for(Ngram ngram: index.keys()){
             for(int i = 0; i< index.get(ngram).size() - 1; i++){
                 for(int j = i+1; j < index.get(ngram).size(); j++){
@@ -116,7 +116,7 @@ public class Lab3 {
 
     // Phase 4: find all pairs of files with more than 30 n-grams
     // in common, sorted in descending order of similarity.
-    static ArrayList<PathPair> findMostSimilar(BST<PathPair, Integer> similarity) {
+    static ArrayList<PathPair> findMostSimilar(ScapegoatTree<PathPair, Integer> similarity) {
         // Find all pairs of files with more than 100 n-grams in common.
         ArrayList<PathPair> mostSimilar = new ArrayList<>();
         for (PathPair pair: similarity.keys()) {

@@ -24,10 +24,11 @@ import java.util.ArrayList;
  */
 public class ScapegoatTree<Key extends Comparable<Key>, Value> {
     final double alpha = 2;        // how unbalanced the tree may become;
-                                   // alpha must be greater than 1,
-                                   // height is always <= alpha * lg size.
+    // alpha must be greater than 1,
+    // height is always <= alpha * lg size.
 
     private Node root;             // root of BST
+
     private class Node {
         private Key key;           // sorted by key
         private Value val;         // associated data
@@ -53,6 +54,7 @@ public class ScapegoatTree<Key extends Comparable<Key>, Value> {
 
     /**
      * Returns the number of key-value pairs in this symbol table.
+     *
      * @return the number of key-value pairs in this symbol table
      */
     public int size() {
@@ -68,9 +70,9 @@ public class ScapegoatTree<Key extends Comparable<Key>, Value> {
     /**
      * Does this symbol table contain the given key?
      *
-     * @param  key the key
+     * @param key the key
      * @return {@code true} if this symbol table contains {@code key} and
-     *         {@code false} otherwise
+     * {@code false} otherwise
      * @throws IllegalArgumentException if {@code key} is {@code null}
      */
     public boolean contains(Key key) {
@@ -81,9 +83,9 @@ public class ScapegoatTree<Key extends Comparable<Key>, Value> {
     /**
      * Returns the value associated with the given key.
      *
-     * @param  key the key
+     * @param key the key
      * @return the value associated with the given key if the key is in the symbol table
-     *         and {@code null} if the key is not in the symbol table
+     * and {@code null} if the key is not in the symbol table
      * @throws IllegalArgumentException if {@code key} is {@code null}
      */
     public Value get(Key key) {
@@ -94,22 +96,22 @@ public class ScapegoatTree<Key extends Comparable<Key>, Value> {
         if (key == null) throw new IllegalArgumentException("calls get() with a null key");
         if (x == null) return null;
         int cmp = key.compareTo(x.key);
-        if      (cmp < 0) return get(x.left, key);
+        if (cmp < 0) return get(x.left, key);
         else if (cmp > 0) return get(x.right, key);
-        else              return x.val;
+        else return x.val;
     }
 
     /**
-     * Inserts the specified key-value pair into the symbol table, overwriting the old 
+     * Inserts the specified key-value pair into the symbol table, overwriting the old
      * value with the new value if the symbol table already contains the specified key.
      * Deletes the specified key (and its associated value) from this symbol table
      * if the specified value is {@code null}.
      *
-     * @param  key the key
-     * @param  val the value
+     * @param key the key
+     * @param val the value
      * @throws IllegalArgumentException if {@code key} is {@code null}
      */
-    public void put(Key key, Value val) {
+    public void put(Key key, Value val) { //SKIT I DENNA
         if (key == null) throw new IllegalArgumentException("calls put() with a null key");
         root = put(root, key, val);
         assert check();
@@ -120,17 +122,19 @@ public class ScapegoatTree<Key extends Comparable<Key>, Value> {
         int cmp = key.compareTo(node.key);
 
         // TO DO: finish implementing put.
-		// If you like you can start from the code for put in BST.java.
+        // If you like you can start from the code for put in BST.java.
         // Read the lab instructions for more hints!
-        if (cmp < 0) {
-            // key is less than node.key
-        } else if (cmp > 0) {
-            // key is greater than node.key
-        } else {
-            // key is equal to node.key
-        }
+        if (cmp < 0) node.left = put(node.left, key, val);
+        else if (cmp > 0) node.right = put(node.right, key, val);
+        else node.val = val;
 
-        throw new UnsupportedOperationException();
+        node.size = 1 +size(node.left) + size(node.right);
+        node.height = 1 + Math.max(height(node.left), height(node.right));
+
+        //rebuild
+        if(node.height > alpha * log2(node.size)) return rebuild(node);
+        return node;
+
     }
 
 	// Rebuild a tree to make it perfectly balanced.
@@ -146,7 +150,10 @@ public class ScapegoatTree<Key extends Comparable<Key>, Value> {
     private void inorder(Node node, ArrayList<Node> nodes) {
         // TO DO: use in-order traversal to store 'node' and all
         // descendants into 'nodes' ArrayList
-        throw new UnsupportedOperationException();
+        if(node == null) return;
+        inorder(node.left, nodes);
+        nodes.add(node);
+        inorder(node.right, nodes);
     }
 
 	// Convert an array of nodes into a balanced BST.
