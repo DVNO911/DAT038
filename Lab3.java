@@ -77,37 +77,40 @@ public class Lab3 {
         return files;
     }
 
-    // Phase 2: build index of n-grams (not implemented yet)
     static BST<Ngram, ArrayList<Path>> buildIndex(BST<Path, Ngram[]> files) {
         BST<Ngram, ArrayList<Path>> index = new BST<>();
-        // TO DO: build index of n-grams
+            for(Path p : files.keys()){
+                for(Ngram ngram : files.get(p)){
+                    if(index.contains(ngram)){
+                            index.get(ngram).add(p);
+
+                    }
+                    else{
+                        ArrayList<Path> newPath = new ArrayList<>();
+                        newPath.add(p);
+                        index.put(ngram, newPath);
+                    }
+                }
+        }
         return index;
     }
 
     // Phase 3: Count how many n-grams each pair of files has in common.
+
     static BST<PathPair, Integer> findSimilarity(BST<Path, Ngram[]> files, BST<Ngram, ArrayList<Path>> index) {
-        // TO DO: use index to make this loop much more efficient
-        // N.B. Path is Java's class for representing filenames
-        // PathPair represents a pair of Paths (see PathPair.java)
         BST<PathPair, Integer> similarity = new BST<>();
-        for (Path path1: files.keys()) {
-            for (Path path2: files.keys()) {
-                if (path1.equals(path2)) continue;
-                for (Ngram ngram1: files.get(path1)) {
-                    for (Ngram ngram2: files.get(path2)) {
-                        if (ngram1.equals(ngram2)) {
-                            PathPair pair = new PathPair(path1, path2);
+        for(Ngram ngram: index.keys()){
+            for(int i = 0; i< index.get(ngram).size() - 1; i++){
+                for(int j = i+1; j < index.get(ngram).size(); j++){
+                    PathPair pair = new PathPair(index.get(ngram).get(j), index.get(ngram).get(i));
 
-                            if (!similarity.contains(pair))
-                                similarity.put(pair, 0);
-
-                            similarity.put(pair, similarity.get(pair)+1);
-                        }
+                    if(!similarity.contains(pair)){
+                        similarity.put(pair, 0);
                     }
+                    similarity.put(pair, similarity.get(pair) + 1);
                 }
             }
         }
-
         return similarity;
     }
 
